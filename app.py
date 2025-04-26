@@ -9,11 +9,11 @@ app = Flask(__name__)
 
 # Constants
 MODEL_PATH = "farmassit-plant-model.keras"
-UPLOAD_FOLDER = "./uploadimages"
+#UPLOAD_FOLDER = "./uploadimages"
 GDRIVE_URL = "https://drive.google.com/uc?id=1w1gQJYKLLpi6-vW4wGyBKA0XE85lt-u4"
 
 # Ensure upload directory exists
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+#os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Download model from Google Drive if not already present
 if not os.path.exists(MODEL_PATH):
