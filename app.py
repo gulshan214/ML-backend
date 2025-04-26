@@ -5,25 +5,21 @@ import tensorflow as tf
 from werkzeug.utils import secure_filename
 import json
 import os
-
-#import uuid
-i#mport json
 import gdown
-#import numpy as np
-#import tensorflow as tf
-#from flask import Flask, request, jsonify
-#from werkzeug.utils import secure_filename
-
+from flask_cors import CORS  # Import CORS
 
 app = Flask(__name__)
 
+# Enable CORS for all routes and origins
+CORS(app)
+
 # Constants
 MODEL_PATH = "farmassit-plant-model.keras"
-#UPLOAD_FOLDER = "./uploadimages"
+UPLOAD_FOLDER = "./uploadimages"
 GDRIVE_URL = "https://drive.google.com/uc?id=1w1gQJYKLLpi6-vW4wGyBKA0XE85lt-u4"
 
 # Ensure upload directory exists
-#os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Download model from Google Drive if not already present
 if not os.path.exists(MODEL_PATH):
@@ -31,49 +27,20 @@ if not os.path.exists(MODEL_PATH):
     gdown.download(GDRIVE_URL, MODEL_PATH, quiet=False)
     print("Model downloaded successfully.")
 
+model = tf.keras.models.load_model(MODEL_PATH)
+label = ['Apple___Apple_scab', 'Apple___Black_rot', 'Apple___Cedar_apple_rust', 'Apple___healthy', 
+         'Background_without_leaves', 'Blueberry___healthy', 'Cherry___Powdery_mildew', 'Cherry___healthy', 
+         'Corn___Cercospora_leaf_spot Gray_leaf_spot', 'Corn___Common_rust', 'Corn___Northern_Leaf_Blight', 
+         'Corn___healthy', 'Grape___Black_rot', 'Grape___Esca_(Black_Measles)', 'Grape___Leaf_blight_(Isariopsis_Leaf_Spot)', 
+         'Grape___healthy', 'Orange___Haunglongbing_(Citrus_greening)', 'Peach___Bacterial_spot', 'Peach___healthy', 
+         'Pepper,_bell___Bacterial_spot', 'Pepper,_bell___healthy', 'Potato___Early_blight', 'Potato___Late_blight', 
+         'Potato___healthy', 'Raspberry___healthy', 'Soybean___healthy', 'Squash___Powdery_mildew', 
+         'Strawberry___Leaf_scorch', 'Strawberry___healthy', 'Tomato___Bacterial_spot', 'Tomato___Early_blight', 
+         'Tomato___Late_blight', 'Tomato___Leaf_Mold', 'Tomato___Septoria_leaf_spot', 
+         'Tomato___Spider_mites Two-spotted_spider_mite', 'Tomato___Target_Spot', 
+         'Tomato___Tomato_Yellow_Leaf_Curl_Virus', 'Tomato___Tomato_mosaic_virus', 'Tomato___healthy']
 
-model = tf.keras.models.load_model("MODEL_PATH")
-label = ['Apple___Apple_scab',
- 'Apple___Black_rot',
- 'Apple___Cedar_apple_rust',
- 'Apple___healthy',
- 'Background_without_leaves',
- 'Blueberry___healthy',
- 'Cherry___Powdery_mildew',
- 'Cherry___healthy',
- 'Corn___Cercospora_leaf_spot Gray_leaf_spot',
- 'Corn___Common_rust',
- 'Corn___Northern_Leaf_Blight',
- 'Corn___healthy',
- 'Grape___Black_rot',
- 'Grape___Esca_(Black_Measles)',
- 'Grape___Leaf_blight_(Isariopsis_Leaf_Spot)',
- 'Grape___healthy',
- 'Orange___Haunglongbing_(Citrus_greening)',
- 'Peach___Bacterial_spot',
- 'Peach___healthy',
- 'Pepper,_bell___Bacterial_spot',
- 'Pepper,_bell___healthy',
- 'Potato___Early_blight',
- 'Potato___Late_blight',
- 'Potato___healthy',
- 'Raspberry___healthy',
- 'Soybean___healthy',
- 'Squash___Powdery_mildew',
- 'Strawberry___Leaf_scorch',
- 'Strawberry___healthy',
- 'Tomato___Bacterial_spot',
- 'Tomato___Early_blight',
- 'Tomato___Late_blight',
- 'Tomato___Leaf_Mold',
- 'Tomato___Septoria_leaf_spot',
- 'Tomato___Spider_mites Two-spotted_spider_mite',
- 'Tomato___Target_Spot',
- 'Tomato___Tomato_Yellow_Leaf_Curl_Virus',
- 'Tomato___Tomato_mosaic_virus',
- 'Tomato___healthy'] #label list
-
-with open("plant_disease.json",'r') as file:
+with open("plant_disease.json", 'r') as file:
     plant_disease = json.load(file)
 
 def extract_features(image):
